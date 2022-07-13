@@ -59,27 +59,31 @@ export default class Home extends React.Component {
             </View>
             {/* Color selection */}
             <View style={styles.colorContainer}>
-              <Text style={{}}>Choose Background Color:</Text>
-              <TouchableOpacity
-                style={styles.backgroundBlack}
-                onPress={() => this.setState({ colors: "black" })}
-                value={this.state.colors}
-              ></TouchableOpacity>
-              <TouchableOpacity
-                style={styles.backgroundBrown}
-                onPress={() => this.setState({ colors: "brown" })}
-                value={this.state.colors}
-              ></TouchableOpacity>
-              <TouchableOpacity
-                style={styles.backgroundGray}
-                onPress={() => this.setState({ colors: "gray" })}
-                value={this.state.colors}
-              ></TouchableOpacity>
-              <TouchableOpacity
-                style={styles.backgroundGreen}
-                onPress={() => this.setState({ colors: "green" })}
-                value={this.state.colors}
-              ></TouchableOpacity>
+              <Text style={styles.colorPaletteText}>
+                Choose Background Color:
+              </Text>
+              <View style={styles.colorButtons}>
+                <TouchableOpacity
+                  style={styles.backgroundBlack}
+                  onPress={() => this.setState({ colors: "black" })}
+                  value={this.state.colors}
+                ></TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.backgroundBrown}
+                  onPress={() => this.setState({ colors: "brown" })}
+                  value={this.state.colors}
+                ></TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.backgroundGray}
+                  onPress={() => this.setState({ colors: "gray" })}
+                  value={this.state.colors}
+                ></TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.backgroundGreen}
+                  onPress={() => this.setState({ colors: "green" })}
+                  value={this.state.colors}
+                ></TouchableOpacity>
+              </View>
             </View>
             <Button
               title="Submit"
@@ -111,24 +115,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   image: {
+    flex: 1,
     justifyContent: "center",
     alignItems: "center",
     resizeMode: "cover",
   },
   container: {
-    flex: 500,
+    flex: 300,
     justifyContent: "center",
     alignItems: "center",
     padding: 20,
   },
   colorContainer: {
-    flex: 0.45,
-    flexDirection: "row",
     backgroundColor: "white",
     justifyContent: "space-evenly",
-    padding: 125,
-    marginLeft: 85,
-    marginRight: 85,
+    padding: 5,
+    marginLeft: 15,
+    marginRight: 15,
   },
   backgroundBlack: {
     borderColor: "black",
@@ -136,38 +139,42 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     borderWidth: 25,
     height: 15,
-    margin: 15,
     alignItems: "center",
-    marginRight: 75,
   },
   backgroundBrown: {
     borderColor: "#483B38",
     alignSelf: "center",
-    margin: 15,
     borderRadius: 50,
     borderWidth: 25,
     height: 15,
     alignItems: "center",
-    marginRight: 75,
   },
   backgroundGray: {
     borderColor: "#9CADB7",
     alignSelf: "center",
-    margin: 15,
     borderRadius: 50,
     borderWidth: 25,
     height: 15,
     alignItems: "center",
-    marginRight: 75,
   },
   backgroundGreen: {
     borderColor: "#3D4838",
     alignSelf: "center",
-    margin: 15,
     borderRadius: 50,
     borderWidth: 25,
     height: 15,
     alignItems: "center",
-    marginRight: 75,
+  },
+  colorButtons: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+  },
+  colorPaletteText: {
+    color: "#757083",
+    fontSize: 18,
+    fontWeight: "300",
+    marginBottom: 10,
+    textAlign: "center",
   },
 });
