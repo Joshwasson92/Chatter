@@ -64,21 +64,37 @@ export default class Home extends React.Component {
               </Text>
               <View style={styles.colorButtons}>
                 <TouchableOpacity
+                  accessible={true}
+                  accessibilityLabel="More options"
+                  accessibilityHint="Lets you choose to send an image or your geolocation."
+                  accessibilityRole="button"
                   style={styles.backgroundBlack}
                   onPress={() => this.setState({ colors: "black" })}
                   value={this.state.colors}
                 ></TouchableOpacity>
                 <TouchableOpacity
+                  accessible={true}
+                  accessibilityLabel="More options"
+                  accessibilityHint="Lets you choose to send an image or your geolocation."
+                  accessibilityRole="button"
                   style={styles.backgroundBrown}
                   onPress={() => this.setState({ colors: "brown" })}
                   value={this.state.colors}
                 ></TouchableOpacity>
                 <TouchableOpacity
+                  accessible={true}
+                  accessibilityLabel="More options"
+                  accessibilityHint="Lets you choose to send an image or your geolocation."
+                  accessibilityRole="button"
                   style={styles.backgroundGray}
                   onPress={() => this.setState({ colors: "gray" })}
                   value={this.state.colors}
                 ></TouchableOpacity>
                 <TouchableOpacity
+                  accessible={true}
+                  accessibilityLabel="More options"
+                  accessibilityHint="Lets you choose to send an image or your geolocation."
+                  accessibilityRole="button"
                   style={styles.backgroundGreen}
                   onPress={() => this.setState({ colors: "green" })}
                   value={this.state.colors}
