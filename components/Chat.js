@@ -42,46 +42,20 @@ export default class Chat extends React.Component {
     this.referenceChatMessages = firebase.firestore().collection("messages");
   }
 
-  componentDidMount() {
-    this.authUnsubscribe = firebase.auth().onAuthStateChanged((user) => {
-      if (!user) {
-        firebase.auth().signInAnonymously();
-      }
-      this.setState({
-        uid: user.uid,
-        messages: [],
-      });
-      // create a reference to the actives users messages
-      this.referenceChatMessagesUser = firebase
-        .firestore()
-        .collection("messages")
-        .where("uid", "==", this.state.uid);
-      this.unsubscribe = this.referenceChatMessages
-        .orderBy("createdAt", "desc")
-        .onSnapshot(this.onCollectionUpdate);
-      // listen for collection changes for current user
-      this.unsubscribeUser = this.referenceChatMessagesUser.onSnapshot(
-        this.onCollectionUpdate
-      );
-    });
-  }
-
-  componentWillUnmount() {
-    this.unsubscribe();
-  }
-
   onCollectionUpdate = (querySnapshot) => {
     const messages = [];
     //  go through each document
     querySnapshot.forEach((doc) => {
-      //get the QueryDocument Snapshot's data
+      //get the QueryDocumentSnapshot's data
       var data = doc.data();
       messages.push({
         _id: data._id,
         text: data.text,
         createdAt: data.createdAt.toDate(),
-        user: data.user,
-        uid: this.state.uid,
+        user: {
+          _id: data.user._id,
+          name: data.user.name,
+        },
       });
     });
     this.setState({
@@ -89,23 +63,54 @@ export default class Chat extends React.Component {
     });
   };
 
-  addMessages = (message) => {
-    this.referenceChatMessages.add({
-      uid: this.state.uid,
-      text: message.text,
-      createdAt: message.createdAt.toDate(),
-      user: message.user,
+  componentDidMount() {
+    // Set name as title chat
+    let { name } = this.props.route.params;
+    this.props.navigation.setOptions({ title: name });
+
+    // Reference to load firebase messages
+    this.referenceChatMessages = firebase.firestore().collection("messages");
+
+    // Authenticate user anonymously
+    this.authUnsubscribe = firebase.auth().onAuthStateChanged((user) => {
+      if (!user) {
+        firebase.auth().signInAnonymously();
+      }
+      this.setState({
+        uid: user.uid,
+        messages: [],
+        user: {
+          _id: user.uid,
+          name: name,
+        },
+      });
+      this.unsubscribe = this.referenceChatMessages
+        .orderBy("createdAt", "desc")
+        .onSnapshot(this.onCollectionUpdate);
     });
-  };
+  }
+  componentWillUnmount() {
+    this.unsubscribe();
+  }
 
   onSend(messages = []) {
     this.setState((previousState) => ({
       messages: GiftedChat.append(previousState.messages, messages),
     }));
     () => {
-      this.addMessages;
+      this.addMessages(this.state.messages[0]);
     };
   }
+
+  addMessages = (message) => {
+    this.referenceChatMessages.add({
+      uid: this.state.uid,
+      _id: message._id,
+      text: message.text,
+      createdAt: message.createdAt,
+      user: message.user,
+    });
+  };
   // chat bubble customization
   renderBubble(props) {
     return (
@@ -137,7 +142,8 @@ export default class Chat extends React.Component {
           messages={this.state.messages}
           onSend={(messages) => this.onSend(messages)}
           user={{
-            _id: 1,
+            _id: this.state.user._id,
+            name: name,
           }}
         />
       </View>
