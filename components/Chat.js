@@ -20,7 +20,7 @@ export default class Chat extends React.Component {
     super();
     this.state = {
       messages: [],
-      uid: "",
+      uid: 0,
       user: {
         _id: "",
         name: "",
@@ -29,14 +29,17 @@ export default class Chat extends React.Component {
     //firebase info
 
     if (!firebase.apps.length) {
-      firebase.initializeApp({
+      const firebaseConfig = {
         apiKey: "AIzaSyAoyDUmDZISriQVw2m7YBBrss5ybzYbcYE",
         authDomain: "chatter-9d208.firebaseapp.com",
         projectId: "chatter-9d208",
         storageBucket: "chatter-9d208.appspot.com",
         messagingSenderId: "952212377442",
         appId: "1:952212377442:web:e1ae1c8c90408dd7b7263b",
-      });
+      };
+      if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+      }
     }
     // Reference to Firestore collection
     this.referenceChatMessages = firebase.firestore().collection("messages");
@@ -70,11 +73,12 @@ export default class Chat extends React.Component {
 
     // Reference to load firebase messages
     this.referenceChatMessages = firebase.firestore().collection("messages");
+    console.log(this.state);
 
     // Authenticate user anonymously
-    this.authUnsubscribe = firebase.auth().onAuthStateChanged((user) => {
+    this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
       if (!user) {
-        firebase.auth().signInAnonymously();
+        await firebase.auth().signInAnonymously();
       }
       this.setState({
         uid: user.uid,
@@ -93,15 +97,6 @@ export default class Chat extends React.Component {
     this.unsubscribe();
   }
 
-  onSend(messages = []) {
-    this.setState((previousState) => ({
-      messages: GiftedChat.append(previousState.messages, messages),
-    }));
-    () => {
-      this.addMessages(this.state.messages[0]);
-    };
-  }
-
   addMessages = (message) => {
     this.referenceChatMessages.add({
       uid: this.state.uid,
@@ -110,7 +105,17 @@ export default class Chat extends React.Component {
       createdAt: message.createdAt,
       user: message.user,
     });
+    console.log(message.text);
   };
+
+  onSend(messages = []) {
+    this.setState((previousState) => ({
+      messages: GiftedChat.append(previousState.messages, messages),
+    }));
+    () => {
+      this.addMessages(this.state.messages[0]);
+    };
+  }
   // chat bubble customization
   renderBubble(props) {
     return (
