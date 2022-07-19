@@ -1,4 +1,5 @@
 import React from "react";
+
 const firebase = require("firebase");
 require("firebase/firestore");
 import { initializeApp } from "firebase/app";
@@ -26,23 +27,55 @@ export default class Chat extends React.Component {
         name: "",
       },
     };
+
     //firebase info
+    const firebaseConfig = {
+      apiKey: "AIzaSyAoyDUmDZISriQVw2m7YBBrss5ybzYbcYE",
+      authDomain: "chatter-9d208.firebaseapp.com",
+      projectId: "chatter-9d208",
+      storageBucket: "chatter-9d208.appspot.com",
+      messagingSenderId: "952212377442",
+      appId: "1:952212377442:web:e1ae1c8c90408dd7b7263b",
+    };
 
     if (!firebase.apps.length) {
-      const firebaseConfig = {
-        apiKey: "AIzaSyAoyDUmDZISriQVw2m7YBBrss5ybzYbcYE",
-        authDomain: "chatter-9d208.firebaseapp.com",
-        projectId: "chatter-9d208",
-        storageBucket: "chatter-9d208.appspot.com",
-        messagingSenderId: "952212377442",
-        appId: "1:952212377442:web:e1ae1c8c90408dd7b7263b",
-      };
-      if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-      }
+      firebase.initializeApp(firebaseConfig);
     }
+
     // Reference to Firestore collection
     this.referenceChatMessages = firebase.firestore().collection("messages");
+    currentUserMessages = null;
+  }
+
+  componentDidMount() {
+    // Set name as title chat
+    let { name } = this.props.route.params;
+    this.props.navigation.setOptions({ title: name });
+
+    // Authenticate user anonymously
+    this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
+      if (!user) {
+        await firebase.auth().signInAnonymously();
+      }
+      this.setState({
+        uid: user.uid,
+        messages: [],
+        user: {
+          _id: user.uid,
+          name: name,
+        },
+      });
+      this.currentUserMessages = firebase
+        .firestore()
+        .collection("messages")
+        .where("uid", "==", user.uid);
+    });
+    // Reference to load firebase messages
+    // this.referenceChatMessages = firebase.firestore().collection("messages");
+
+    this.unsubscribe = this.referenceChatMessages
+      .orderBy("createdAt", "desc")
+      .onSnapshot(this.onCollectionUpdate);
   }
 
   onCollectionUpdate = (querySnapshot) => {
@@ -66,55 +99,31 @@ export default class Chat extends React.Component {
     });
   };
 
-  componentDidMount() {
-    // Set name as title chat
-    let { name } = this.props.route.params;
-    this.props.navigation.setOptions({ title: name });
-
-    // Reference to load firebase messages
-    this.referenceChatMessages = firebase.firestore().collection("messages");
-    console.log(this.state);
-
-    // Authenticate user anonymously
-    this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
-      if (!user) {
-        await firebase.auth().signInAnonymously();
-      }
-      this.setState({
-        uid: user.uid,
-        messages: [],
-        user: {
-          _id: user.uid,
-          name: name,
-        },
-      });
-      this.unsubscribe = this.referenceChatMessages
-        .orderBy("createdAt", "desc")
-        .onSnapshot(this.onCollectionUpdate);
-    });
-  }
   componentWillUnmount() {
     this.unsubscribe();
   }
 
-  addMessages = (message) => {
+  addMessage() {
+    const message = this.state.messages[0];
+
     this.referenceChatMessages.add({
       uid: this.state.uid,
       _id: message._id,
       text: message.text,
       createdAt: message.createdAt,
-      user: message.user,
+      user: this.state.user,
     });
-    console.log(message.text);
-  };
+  }
 
   onSend(messages = []) {
-    this.setState((previousState) => ({
-      messages: GiftedChat.append(previousState.messages, messages),
-    }));
-    () => {
-      this.addMessages(this.state.messages[0]);
-    };
+    this.setState(
+      (previousState) => ({
+        messages: GiftedChat.append(previousState.messages, messages),
+      }),
+      () => {
+        this.addMessage();
+      }
+    );
   }
   // chat bubble customization
   renderBubble(props) {
