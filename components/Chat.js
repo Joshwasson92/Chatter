@@ -1,4 +1,7 @@
 import React from "react";
+import { GiftedChat, Bubble, InputToolbar } from "react-native-gifted-chat";
+import NetInfo from "@react-native-community/netinfo";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const firebase = require("firebase");
 require("firebase/firestore");
@@ -14,7 +17,6 @@ import {
   Platform,
   KeyboardAvoidingView,
 } from "react-native";
-import { GiftedChat, Bubble } from "react-native-gifted-chat";
 
 export default class Chat extends React.Component {
   constructor() {
@@ -26,6 +28,7 @@ export default class Chat extends React.Component {
         _id: "",
         name: "",
       },
+      isConnected: false,
     };
 
     //firebase info
@@ -76,6 +79,57 @@ export default class Chat extends React.Component {
     this.unsubscribe = this.referenceChatMessages
       .orderBy("createdAt", "desc")
       .onSnapshot(this.onCollectionUpdate);
+
+    // verify internet connection
+    NetInfo.fetch().then((connection) => {
+      if (connection.isConnected) {
+        this.setState({ isConnected: true });
+        console.log("online");
+        console.log(this.state.isConnected);
+      } else {
+        console.log("offline");
+      }
+    });
+  }
+
+  async getMessages() {
+    let messages = "";
+    try {
+      messages = (await AsyncStorage.getItem("messages")) || [];
+      this.setState({
+        messages: JSON.parse(messages),
+      });
+    } catch (error) {}
+  }
+
+  async saveMessages() {
+    try {
+      await AsyncStorage.setItem(
+        "messages",
+        JSON.stringify(this.state.messages)
+      );
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
+  async deleteMessages() {
+    try {
+      await AsyncStorage.removeItem("messages");
+      this.setState({
+        messages: [],
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
+  renderInputToolbar(props) {
+    if (this.state.isConnected == false) {
+      this.getMessages();
+    } else {
+      return <InputToolbar {...props} />;
+    }
   }
 
   onCollectionUpdate = (querySnapshot) => {
@@ -122,6 +176,7 @@ export default class Chat extends React.Component {
       }),
       () => {
         this.addMessage();
+        this.saveMessages();
       }
     );
   }
@@ -152,6 +207,7 @@ export default class Chat extends React.Component {
 
         {/* GiftedChat Components */}
         <GiftedChat
+          renderInputToolbar={this.renderInputToolbar.bind(this)}
           renderBubble={this.renderBubble.bind(this)}
           messages={this.state.messages}
           onSend={(messages) => this.onSend(messages)}
