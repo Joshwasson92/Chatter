@@ -2,6 +2,7 @@ import React from "react";
 import { GiftedChat, Bubble, InputToolbar } from "react-native-gifted-chat";
 import NetInfo from "@react-native-community/netinfo";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import CustomActions from "./CustomActions";
 
 const firebase = require("firebase");
 require("firebase/firestore");
@@ -27,8 +28,12 @@ export default class Chat extends React.Component {
       user: {
         _id: "",
         name: "",
+        image: null,
+        location: null,
       },
       isConnected: false,
+      image: null,
+      location: null,
     };
 
     //firebase info
@@ -90,6 +95,7 @@ export default class Chat extends React.Component {
         console.log("offline");
       }
     });
+    console.log(this.context);
   }
 
   async getMessages() {
@@ -132,6 +138,8 @@ export default class Chat extends React.Component {
     }
   }
 
+  renderCustomActions = (props) => <CustomActions {...props} />;
+
   onCollectionUpdate = (querySnapshot) => {
     const messages = [];
     //  go through each document
@@ -145,6 +153,8 @@ export default class Chat extends React.Component {
         user: {
           _id: data.user._id,
           name: data.user.name,
+          image: data.image || null,
+          location: data.location || null,
         },
       });
     });
@@ -163,9 +173,11 @@ export default class Chat extends React.Component {
     this.referenceChatMessages.add({
       uid: this.state.uid,
       _id: message._id,
-      text: message.text,
       createdAt: message.createdAt,
+      text: message.text || "",
       user: this.state.user,
+      image: message.image || null,
+      location: message.location || null,
     });
   }
 
@@ -193,6 +205,25 @@ export default class Chat extends React.Component {
       />
     );
   }
+
+  renderCustomView = (props) => {
+    const { currentMessage } = props;
+    if (currentMessage.location) {
+      return (
+        <MapView
+          style={{ width: 150, height: 100, borderRadius: 13, margin: 3 }}
+          region={{
+            latitude: currentMessage.location.latitude,
+            longitude: currentMessage.location.longitude,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          }}
+        />
+      );
+    }
+    return null;
+  };
+
   render() {
     // routing username and background color from home component.
     let name = this.props.route.params.name;
@@ -215,6 +246,8 @@ export default class Chat extends React.Component {
             _id: this.state.user._id,
             name: name,
           }}
+          renderActions={this.renderCustomActions}
+          renderCustomView={this.renderCustomView}
         />
       </View>
     );

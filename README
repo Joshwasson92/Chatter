@@ -1,4 +1,19 @@
-Chatter is a app designed for IOS and Android that allows the user to do the following.
+Chatter is a app designed for IOS and Android using React Native that allows the user to do the following.
 
-- Set their username
-- Set background color.
+Features
+
+\*User can enter their name and choose a custom background color.
+
+\*The chat page will display the conversation including archived messages via Google Firestore.
+
+\*Users can send images or location data as well as standard messages.
+
+Set up
+
+\*To run the project, install npm install expo-cli --global in terminal followed by npm install .
+
+\*Expo app for a mobile device is required as well as a Expo account.
+
+\*To start project enter expo start into the terminal
+
+\*Using your mobile device, scan the QR code from the terminal once the server is up and running.

@@ -1,5 +1,3 @@
-import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
 import Home from "./components/Home";
 import Chat from "./components/Chat";
 import "react-native-gesture-handler";
@@ -10,6 +8,10 @@ import React, { Component } from "react";
 const Stack = createStackNavigator();
 
 export default class App extends React.Component {
+  renderCustomActions = (props) => {
+    return <CustomActions {...props} />;
+  };
+
   render() {
     return (
       <NavigationContainer>
