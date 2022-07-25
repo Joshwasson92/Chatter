@@ -17,3 +17,31 @@ Set up
 \*To start project enter expo start into the terminal
 
 \*Using your mobile device, scan the QR code from the terminal once the server is up and running.
+
+Server Setup
+
+\*A Google Firebase is required. You can sign in at https://firebase.google.com/ to begin the setup.
+
+\*To set up a firebase server, please refer to this tutorial https://firebase.google.com/docs/firestore/quickstart
+
+\*Once that is completed, create a variable that is an object titled firebaseConfig in your chat component and then inside of the object, include your firebase information.
+
+const firebaseConfig = {
+apiKey: "Your API Key",
+authDomain: "Your Firebase Domain",
+projectId: "Your Project ID",
+storageBucket: "Your App.appspot.com",
+messagingSenderId: "Your Sender ID",
+appId: "Your App ID",
+};
+
+\* Then import firebase and include the following.
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+
+    // Reference to Firestore collection
+    this.referenceChatMessages = firebase.firestore().collection("YOUR COLLECTION");
+
+    }
