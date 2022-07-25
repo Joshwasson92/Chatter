@@ -131,12 +131,13 @@ function CustomActions(props) {
         switch (buttonIndex) {
           case 0:
             console.log("user wants to pick an image");
-            return;
+            return imagePicker();
           case 1:
             console.log("user wants to take a photo");
-            return;
+            return takePhoto();
           case 2:
             console.log("user wants to get their location");
+            return getLocation();
           default:
         }
       }
