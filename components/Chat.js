@@ -3,6 +3,7 @@ import { GiftedChat, Bubble, InputToolbar } from "react-native-gifted-chat";
 import NetInfo from "@react-native-community/netinfo";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomActions from "./CustomActions";
+import MapView from "react-native-maps";
 
 const firebase = require("firebase");
 require("firebase/firestore");
@@ -152,9 +153,9 @@ export default class Chat extends React.Component {
         user: {
           _id: data.user._id,
           name: data.user.name,
-          image: data.image || null,
-          location: data.location || null,
         },
+        image: data.image || null,
+        location: data.location || null,
       });
     });
     this.setState({

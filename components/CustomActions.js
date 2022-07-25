@@ -12,6 +12,8 @@ import {
 } from "@expo/react-native-action-sheet";
 
 function CustomActions(props) {
+  const { showActionSheetWithOptions } = useActionSheet();
+
   const imagePicker = async () => {
     // expo permission
     const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
@@ -23,7 +25,7 @@ function CustomActions(props) {
         }).catch((error) => console.log(error));
         // canceled process
         if (!result.cancelled) {
-          const imageUrl = await props.uploadImageFetch(result.uri);
+          const imageUrl = await uploadImageFetch(result.uri);
           props.onSend({ image: imageUrl });
         }
       }
@@ -112,7 +114,7 @@ function CustomActions(props) {
     return await snapshot.ref.getDownloadURL();
   };
 
-  const onActionPress = () => {
+  function onActionPress() {
     const options = [
       "Choose From Library",
       "Take Picture",
@@ -121,7 +123,6 @@ function CustomActions(props) {
     ];
     const cancelButtonIndex = options.length - 1;
 
-    const { showActionSheetWithOptions } = useActionSheet();
     showActionSheetWithOptions(
       {
         options,
@@ -142,10 +143,10 @@ function CustomActions(props) {
         }
       }
     );
-  };
+  }
 
   return (
-    <TouchableOpacity style={[styles.container]} onPress={props.onActionPress}>
+    <TouchableOpacity style={[styles.container]} onPress={onActionPress}>
       <View style={[styles.wrapper, props.wrapperStyle]}>
         <Text style={[styles.iconText, props.iconTextStyle]}>+</Text>
       </View>
