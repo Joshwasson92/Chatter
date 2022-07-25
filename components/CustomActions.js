@@ -6,10 +6,13 @@ import * as ImagePicker from "expo-image-picker";
 import * as Location from "expo-location";
 import firebase from "firebase";
 import firestore from "firebase";
-import { connectActionSheet } from "@expo/react-native-action-sheet";
+import {
+  connectActionSheet,
+  useActionSheet,
+} from "@expo/react-native-action-sheet";
 
-export default class CustomActions extends Component {
-  imagePicker = async () => {
+function CustomActions(props) {
+  const imagePicker = async () => {
     // expo permission
     const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
     try {
@@ -20,8 +23,8 @@ export default class CustomActions extends Component {
         }).catch((error) => console.log(error));
         // canceled process
         if (!result.cancelled) {
-          const imageUrl = await this.uploadImageFetch(result.uri);
-          this.props.onSend({ image: imageUrl });
+          const imageUrl = await props.uploadImageFetch(result.uri);
+          props.onSend({ image: imageUrl });
         }
       }
     } catch (error) {
@@ -32,7 +35,7 @@ export default class CustomActions extends Component {
   /**
    * Let the user take a photo with device's camera
    */
-  takePhoto = async () => {
+  const takePhoto = async () => {
     const { status } = await Permissions.askAsync(
       Permissions.CAMERA,
       Permissions.CAMERA_ROLL
@@ -44,8 +47,8 @@ export default class CustomActions extends Component {
         }).catch((error) => console.log(error));
 
         if (!result.cancelled) {
-          const imageUrl = await this.uploadImageFetch(result.uri);
-          this.props.onSend({ image: imageUrl });
+          const imageUrl = await props.uploadImageFetch(result.uri);
+          props.onSend({ image: imageUrl });
         }
       }
     } catch (error) {
@@ -56,7 +59,7 @@ export default class CustomActions extends Component {
   /**
    * get the location of the user by using GPS
    */
-  getLocation = async () => {
+  const getLocation = async () => {
     try {
       const { status } = await Permissions.askAsync(Permissions.LOCATION);
       if (status === "granted") {
@@ -66,7 +69,7 @@ export default class CustomActions extends Component {
         const longitude = JSON.stringify(result.coords.longitude);
         const altitude = JSON.stringify(result.coords.latitude);
         if (result) {
-          this.props.onSend({
+          props.onSend({
             location: {
               longitude: result.coords.longitude,
               latitude: result.coords.latitude,
@@ -82,7 +85,7 @@ export default class CustomActions extends Component {
   /**
    * Upload images to firebase
    */
-  uploadImageFetch = async (uri) => {
+  const uploadImageFetch = async (uri) => {
     const blob = await new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
       xhr.onload = function () {
@@ -109,7 +112,7 @@ export default class CustomActions extends Component {
     return await snapshot.ref.getDownloadURL();
   };
 
-  onActionPress = () => {
+  const onActionPress = () => {
     const options = [
       "Choose From Library",
       "Take Picture",
@@ -117,7 +120,9 @@ export default class CustomActions extends Component {
       "Cancel",
     ];
     const cancelButtonIndex = options.length - 1;
-    this.context.actionSheet().showActionSheetWithOptions(
+
+    const { showActionSheetWithOptions } = useActionSheet();
+    showActionSheetWithOptions(
       {
         options,
         cancelButtonIndex,
@@ -137,15 +142,14 @@ export default class CustomActions extends Component {
       }
     );
   };
-  render() {
-    return (
-      <TouchableOpacity style={[styles.container]} onPress={this.onActionPress}>
-        <View style={[styles.wrapper, this.props.wrapperStyle]}>
-          <Text style={[styles.iconText, this.props.iconTextStyle]}>+</Text>
-        </View>
-      </TouchableOpacity>
-    );
-  }
+
+  return (
+    <TouchableOpacity style={[styles.container]} onPress={props.onActionPress}>
+      <View style={[styles.wrapper, props.wrapperStyle]}>
+        <Text style={[styles.iconText, props.iconTextStyle]}>+</Text>
+      </View>
+    </TouchableOpacity>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -173,3 +177,5 @@ const styles = StyleSheet.create({
 CustomActions.contextTypes = {
   actionSheet: PropTypes.func,
 };
+
+export default CustomActions;

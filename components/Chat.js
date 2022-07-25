@@ -95,7 +95,6 @@ export default class Chat extends React.Component {
         console.log("offline");
       }
     });
-    console.log(this.context);
   }
 
   async getMessages() {
