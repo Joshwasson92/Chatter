@@ -37,7 +37,7 @@ export default class Chat extends React.Component {
       location: null,
     };
 
-    //firebase info
+    /**firebase info */
     const firebaseConfig = {
       apiKey: "AIzaSyAoyDUmDZISriQVw2m7YBBrss5ybzYbcYE",
       authDomain: "chatter-9d208.firebaseapp.com",
@@ -51,17 +51,17 @@ export default class Chat extends React.Component {
       firebase.initializeApp(firebaseConfig);
     }
 
-    // Reference to Firestore collection
+    /**Reference to Firestore collection */
     this.referenceChatMessages = firebase.firestore().collection("messages");
     currentUserMessages = null;
   }
 
   componentDidMount() {
-    // Set name as title chat
+    /**Set name as title chat */
     let { name } = this.props.route.params;
     this.props.navigation.setOptions({ title: name });
 
-    // Authenticate user anonymously
+    /**Authenticate user anonymously */
     this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
       if (!user) {
         await firebase.auth().signInAnonymously();
@@ -79,14 +79,14 @@ export default class Chat extends React.Component {
         .collection("messages")
         .where("uid", "==", user.uid);
     });
-    // Reference to load firebase messages
-    // this.referenceChatMessages = firebase.firestore().collection("messages");
+    /**   Reference to load firebase messages
+     this.referenceChatMessages = firebase.firestore().collection("messages"); */
 
     this.unsubscribe = this.referenceChatMessages
       .orderBy("createdAt", "desc")
       .onSnapshot(this.onCollectionUpdate);
 
-    // verify internet connection
+    /**verify internet connection */
     NetInfo.fetch().then((connection) => {
       if (connection.isConnected) {
         this.setState({ isConnected: true });
@@ -130,6 +130,11 @@ export default class Chat extends React.Component {
     }
   }
 
+  /**
+   * renders the input toolbar library.
+   * @param {object} props
+   * @returns
+   */
   renderInputToolbar(props) {
     if (this.state.isConnected == false) {
       this.getMessages();
@@ -138,13 +143,22 @@ export default class Chat extends React.Component {
     }
   }
 
+  /**
+   * Renders the custom actions component where a user can share picture/video/location.
+   * @param {object} props
+   * @returns
+   */
   renderCustomActions = (props) => <CustomActions {...props} />;
 
+  /**
+   * Update a users collection.
+   * @param {object} querySnapshot
+   */
   onCollectionUpdate = (querySnapshot) => {
     const messages = [];
-    //  go through each document
+    /**go through each document */
     querySnapshot.forEach((doc) => {
-      //get the QueryDocumentSnapshot's data
+      /**get the QueryDocumentSnapshot's data */
       var data = doc.data();
       messages.push({
         _id: data._id,
@@ -167,6 +181,9 @@ export default class Chat extends React.Component {
     this.unsubscribe();
   }
 
+  /**
+   * Adding a message to the users chat window.
+   */
   addMessage() {
     const message = this.state.messages[0];
 
@@ -181,6 +198,10 @@ export default class Chat extends React.Component {
     });
   }
 
+  /**
+   * Sends a message to the chat window.
+   * @param {array} messages
+   */
   onSend(messages = []) {
     this.setState(
       (previousState) => ({
@@ -192,7 +213,8 @@ export default class Chat extends React.Component {
       }
     );
   }
-  // chat bubble customization
+
+  /** chat bubble customization */
   renderBubble(props) {
     return (
       <Bubble
@@ -206,6 +228,11 @@ export default class Chat extends React.Component {
     );
   }
 
+  /**
+   * Function to display region sharing
+   * @param {object} props
+   * @returns location data.
+   */
   renderCustomView = (props) => {
     const { currentMessage } = props;
     if (currentMessage.location) {
@@ -225,7 +252,7 @@ export default class Chat extends React.Component {
   };
 
   render() {
-    // routing username and background color from home component.
+    /**routing username and background color from home component. */
     let name = this.props.route.params.name;
     let { color } = this.props.route.params;
 

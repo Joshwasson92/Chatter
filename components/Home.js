@@ -17,6 +17,9 @@ const colors = {
   black: "black",
 };
 
+/**
+ * Welcome Screen
+ */
 export default class Home extends React.Component {
   constructor(props) {
     super(props);

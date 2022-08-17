@@ -11,11 +11,16 @@ import {
   useActionSheet,
 } from "@expo/react-native-action-sheet";
 
+/**
+ *
+ * @param {object} props
+ * @returns Uses actionsheet styling
+ */
 function CustomActions(props) {
   const { showActionSheetWithOptions } = useActionSheet();
 
   const imagePicker = async () => {
-    // expo permission
+    /**expo permission */
     const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
     try {
       if (status === "granted") {

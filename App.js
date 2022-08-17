@@ -7,6 +7,7 @@ import React, { Component } from "react";
 
 const Stack = createStackNavigator();
 
+/**Main component. */
 export default class App extends React.Component {
   renderCustomActions = (props) => {
     return <CustomActions {...props} />;
